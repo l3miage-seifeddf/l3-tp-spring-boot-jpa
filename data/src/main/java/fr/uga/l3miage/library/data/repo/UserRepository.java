@@ -5,6 +5,8 @@ import jakarta.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
+import java.util.Calendar;
 import java.util.List;
 
 @Repository
@@ -38,14 +40,19 @@ public class UserRepository implements CRUDRepository<String, User> {
         return entityManager.createQuery("from User", User.class).getResultList();
     }
 
-    /**
+/**
      * Trouve tous les utilisateurs ayant plus de l'age passé
      * @param age l'age minimum de l'utilisateur
      * @return
      */
     public List<User> findAllOlderThan(int age) {
-        // TODO
-        return null;
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.YEAR, -age);
+        Date dateLimite = cal.getTime();
+        String jpql = "select u from User u where u.birth <= :dateLimite";
+        return entityManager.createQuery(jpql, User.class)
+        .setParameter("dateLimite", dateLimite)
+        .getResultList();
     }
 
 }

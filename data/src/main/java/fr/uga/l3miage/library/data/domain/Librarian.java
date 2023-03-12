@@ -2,8 +2,19 @@ package fr.uga.l3miage.library.data.domain;
 
 import java.util.Objects;
 
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToOne;
+// import jakarta.persistence.OneToMany;
+// import jakarta.persistence.Table;
+import jakarta.persistence.OneToMany;
+
+@Entity
+@DiscriminatorValue("LIBRARIAN")
 public class Librarian extends Person {
 
+    @ManyToOne
+    @OneToMany(mappedBy = "manager")
     private Librarian manager;
 
     public Librarian getManager() {

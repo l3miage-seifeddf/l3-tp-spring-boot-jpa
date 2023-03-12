@@ -1,21 +1,56 @@
 package fr.uga.l3miage.library.data.domain;
 
-import jakarta.persistence.Transient;
+
 
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-public class Book {
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.NamedQuery;
+import jakarta.persistence.NamedQueries;
+import jakarta.persistence.Table;
+import jakarta.persistence.Column;
+import jakarta.persistence.Id;
 
+// @Getter
+// @Setter
+@NamedQueries(
+    {
+        @NamedQuery(name = "all-books",query = "select b from Book b order by b.title"),
+        @NamedQuery(name = "find-books-by-title",query = "select b from Book b where b.title ilike concat('%',:titlePart,'%')"),
+        @NamedQuery(name = "find-books-by-author-and-title",query = "SELECT b FROM Book b JOIN b.authors a WHERE a.id = :authorId AND LOWER(b.title) LIKE LOWER(CONCAT('%', :titlePart, '%'))"),
+        @NamedQuery(name = "find-books-by-authors-name",query = "select b from Book b JOIN b.authors a where a in :authors"),
+        @NamedQuery(name = "find-books-by-several-authors",query = "SELECT b FROM Book b JOIN b.authors a GROUP BY b HAVING COUNT(a) > :count")
+    }
+)
+@Entity
+@Table(name="Book")
+public class Book {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id")
     private Long id;
+
+    @Column(name = "title")
     private String title;
+
+    @Column(name = "isbn")
     private long isbn;
+
+    @Column(name = "publisher")
     private String publisher;
+
+    @Column(name = "yearB")
     private short year;
+
+    @Column(name = "language")
     private Language language;
 
-    @Transient
+    @ManyToMany
     private Set<Author> authors;
 
     public Long getId() {

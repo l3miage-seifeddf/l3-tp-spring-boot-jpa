@@ -58,4 +58,25 @@ class AuthorRepositoryTest extends Base {
 
     }
 
+    @Test
+    void all() {
+
+        Author a1 = Fixtures.newAuthor();
+        a1.setFullName("William Gibson");
+        Author a2 = Fixtures.newAuthor();
+        a2.setFullName("Arthur Hemingway");
+        entityManager.persist(a1);
+        entityManager.persist(a2);
+        entityManager.flush();
+        entityManager.detach(a1);
+        entityManager.detach(a2);
+
+        List<Author> authors = authorRepository.all();
+        System.out.println(authors);
+        assertThat(authors.size() == 2);
+        assertThat(authors.get(0)).isEqualTo(a2);
+        assertThat(authors.get(1)).isEqualTo(a1);
+
+    }
+
 }

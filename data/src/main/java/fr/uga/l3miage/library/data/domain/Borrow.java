@@ -4,13 +4,55 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.NamedQueries;
+import jakarta.persistence.NamedQuery;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
+
+@NamedQueries(
+    {
+        @NamedQuery(name = "find-current-borrow", query = "select b from Borrow b join b.borrower bw where bw.id = :userId and b.finished=false"),
+        @NamedQuery(name = "count-books-borrowed-user", query = "select sum(size(b.books)) from Borrow b join b.borrower bw where bw.id = :userId"),
+        @NamedQuery(name = "count-current-books-borrowed-user", query = "select sum(size(b.books)) from Borrow b join b.borrower bw where bw.id = :userId and b.finished=false"),
+        @NamedQuery(name = "find-all-late-borrows", query = "SELECT b FROM Borrow b WHERE b.requestedReturn < :currentDate ORDER BY b.requestedReturn"),
+        @NamedQuery(name = "late-borrows-in-days", query = "SELECT b FROM Borrow b WHERE b.requestedReturn <= :dueDate")
+    }
+)
+@Entity
+@Table(name = "Borrow")
 public class Borrow {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id")
     private Long id;
+
+    @OneToMany
+    @JoinColumn(name = "borrow_id")
     private List<Book> books;
+
+    @Temporal(TemporalType.DATE)
     private Date start;
+
+    @Temporal(TemporalType.DATE)
     private Date requestedReturn;
+
+    @OneToOne
     private User borrower;
+
+    @OneToOne
     private Librarian librarian;
+
+    @Column(name = "finished")
     private boolean finished;
 
     public Long getId() {
